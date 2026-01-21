@@ -1,0 +1,29 @@
+name: Daily FBI WMD Fetch
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run fetch
+        env:
+          FBI_API_KEY: ${{ secrets.FBI_API_KEY }}
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          title: 'chore: update fbi-wmd.json'
+          branch: 'update/fbi-wmd'
+          commit-message: 'chore: update fbi-wmd.json'
+          labels: automated,data

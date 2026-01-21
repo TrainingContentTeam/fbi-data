@@ -1,0 +1,6 @@
+{
+  "name": "fbi-wmd-fetch",
+  "version": "1.0.0",
+  "scripts": { "fetch": "node scripts/fetch-fbi.js" },
+  "dependencies": { "node-fetch": "^2.6.7" }
+}
