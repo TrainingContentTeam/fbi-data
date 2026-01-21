@@ -1,8 +1,3 @@
-      - name: Debug — show fetch script header
-        run: |
-          echo "---- scripts/fetch-fbi.js (first 80 lines) ----"
-          sed -n '1,80p' scripts/fetch-fbi.js
-
 name: Daily FBI WMD Fetch
 
 on:
@@ -30,6 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Debug — show fetch script header
+        run: |
+          echo "---- scripts/fetch-fbi.js (first 80 lines) ----"
+          sed -n '1,80p' scripts/fetch-fbi.js
+
       - name: Fetch FBI WMD data
         continue-on-error: true
         run: npm run fetch
@@ -37,6 +37,18 @@ jobs:
           FBI_API_KEY: ${{ secrets.FBI_API_KEY }}
           FROM: '01-2022'
           TO: '01-2026'
+
+      - name: Debug — show error file if present
+        if: always()
+        run: |
+          echo "---- docs directory ----"
+          ls -la docs || true
+          echo "---- docs/fbi-wmd-error.json ----"
+          if [ -f docs/fbi-wmd-error.json ]; then
+            cat docs/fbi-wmd-error.json
+          else
+            echo "No error file found."
+          fi
 
       - name: Create pull request with updated data
         uses: peter-evans/create-pull-request@v5
