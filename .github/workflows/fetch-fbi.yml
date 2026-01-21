@@ -31,13 +31,18 @@ jobs:
           FROM: '01-2022'
           TO: '01-2026'
 
-      - name: Create Pull Request
+          - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           branch: update/fbi-wmd-${{ github.run_number }}-${{ github.run_id }}
           title: 'chore: update fbi-wmd.json (daily fetch)'
           commit-message: 'chore: update fbi-wmd.json (daily fetch)'
           labels: automated,data
+          add-paths: |
+            docs/fbi-wmd.json
+            docs/fbi-wmd-error.json
           body: |
             Automated daily update of FBI WMD (NIBRS 522) data.
+            This PR updates docs/fbi-wmd.json (and docs/fbi-wmd-error.json on failures).
+ 522) data.
             This PR updates docs/fbi-wmd.json (and docs/fbi-wmd-error.json on failures).
