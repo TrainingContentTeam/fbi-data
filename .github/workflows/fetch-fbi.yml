@@ -31,7 +31,7 @@ jobs:
           FROM: '01-2022'
           TO: '01-2026'
 
-          - name: Create Pull Request
+      - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           branch: update/fbi-wmd-${{ github.run_number }}-${{ github.run_id }}
