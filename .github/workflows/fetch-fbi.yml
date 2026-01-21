@@ -2,8 +2,8 @@ name: Daily FBI WMD Fetch
 
 on:
   schedule:
-    - cron: '0 2 * * *'
-  workflow_dispatch:
+    - cron: '0 2 * * *' # daily at 02:00 UTC
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -13,17 +13,31 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: npm ci
-      - run: npm run fetch
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch FBI data
+        run: npm run fetch
         env:
           FBI_API_KEY: ${{ secrets.FBI_API_KEY }}
-      - uses: peter-evans/create-pull-request@v5
+          FROM: '01-2022'
+          TO: '01-2026'
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
         with:
-          title: 'chore: update fbi-wmd.json'
-          branch: 'update/fbi-wmd'
-          commit-message: 'chore: update fbi-wmd.json'
+          branch: update/fbi-wmd-${{ github.run_number }}-${{ github.run_id }}
+          title: 'chore: update fbi-wmd.json (daily fetch)'
+          commit-message: 'chore: update fbi-wmd.json (daily fetch)'
           labels: automated,data
+          body: |
+            Automated daily update of FBI WMD (NIBRS 522) data.
+            This PR updates docs/fbi-wmd.json (and docs/fbi-wmd-error.json on failures).
