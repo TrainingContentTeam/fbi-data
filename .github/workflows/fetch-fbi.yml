@@ -2,7 +2,7 @@ name: Daily FBI WMD Fetch
 
 on:
   schedule:
-    - cron: '0 2 * * *' # daily at 02:00 UTC
+    - cron: '0 2 * * *' # Daily at 02:00 UTC
   workflow_dispatch: {}
 
 permissions:
@@ -12,11 +12,12 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -24,25 +25,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Fetch FBI data
+      - name: Fetch FBI WMD data
         run: npm run fetch
         env:
           FBI_API_KEY: ${{ secrets.FBI_API_KEY }}
           FROM: '01-2022'
           TO: '01-2026'
 
-      - name: Create Pull Request
+      - name: Create pull request with updated data
         uses: peter-evans/create-pull-request@v5
         with:
           branch: update/fbi-wmd-${{ github.run_number }}-${{ github.run_id }}
-          title: 'chore: update fbi-wmd.json (daily fetch)'
-          commit-message: 'chore: update fbi-wmd.json (daily fetch)'
+          title: 'chore: update FBI WMD data (daily)'
+          commit-message: 'chore: update FBI WMD data (daily)'
           labels: automated,data
           add-paths: |
             docs/fbi-wmd.json
             docs/fbi-wmd-error.json
           body: |
-            Automated daily update of FBI WMD (NIBRS 522) data.
-            This PR updates docs/fbi-wmd.json (and docs/fbi-wmd-error.json on failures).
- 522) data.
-            This PR updates docs/fbi-wmd.json (and docs/fbi-wmd-error.json on failures).
+            Automated daily update of FBI Crime Data Explorer
+            NIBRS offense type 522 (Weapons of Mass Destruction).
+
+            This PR updates:
+            - docs/fbi-wmd.json (success)
+            - docs/fbi-wmd-error.json (only present if upstream error occurs)
